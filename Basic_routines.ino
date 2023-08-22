@@ -48,10 +48,10 @@ void read_destination() {
     if (abs(Delta[i]) > TOLERANCE) { 
       digitalWrite(STEPPER_EN_PIN, LOW);  //enable motors
       if (millis() >= last_pulse_time[2*i]+XYZ_prop_rates[2*i]){// time for another pulse 
-//        if (Delta[i] > 0 ? (Current_Position[i] < MAX_POSITION[i]) : (Current_Position[i] > MIN_POSITION[i])) {
+        if (Delta[i] > 0 ? (Current_Position[i] < MAX_POSITION[i]) : (Current_Position[i] > MIN_POSITION[i])) {
           one_step (i, (Delta[i] > 0 ? false : true));// make another pulse, odd or even direction False(+), True(-), False, True, False, True
           last_pulse_time[2*i]= millis();// reset couner for continue steps rate 
-//        }
+        }
       }
     }
   }   
@@ -93,7 +93,7 @@ void print_destination() {
   Serial.print("Destination[XYZmm]: ");
   Serial.print(destination[0],3);
   Serial.print(", ");
-  Serial.print(destination[1],3);
+  Serial.println(destination[1],3);
 //  Serial.print(", ");
 //  Serial.println(destination[2],3);
 }
@@ -104,7 +104,7 @@ void print_position()
   Serial.print("Position[XYZmm]: ");
   Serial.print(Current_Position[0],3);
   Serial.print(", ");
-  Serial.print(Current_Position[1],3);
+  Serial.println(Current_Position[1],3);
 //  Serial.print(", ");
 //  Serial.println(Current_Position[2],3);
 }
@@ -266,7 +266,7 @@ void set_bezier_point(float x, float y) {
 //---------compute bezier variables-----------------
 void compute_bezier_variable(int curve_index) {
   step_index = 0;
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < points_per_curve; i++)
     b[i] = curves[points_per_curve*curve_index+i];
 //    b[i] = curves[points_per_curve*curve_index+i] * MAX_POSITION[i%2];
 
@@ -283,7 +283,7 @@ void compute_bezier_variable(int curve_index) {
   // Compute polynomial coefficients from Bezier points
   coeff[0] = (-b[0] + 3 * b[2] + -3 * b[4] + b[6]);   //ax
   coeff[1] = (-b[1] + 3 * b[3] + -3 * b[5] + b[7]);   //ay
-  coeff[2] = (3 * b[0] + -6 * b[2] + 3 * b[3]);       //bx
+  coeff[2] = (3 * b[0] + -6 * b[2] + 3 * b[4]);       //bx
   coeff[3] =  (3 * b[1] + -6 * b[3] + 3 * b[5]);      //by
   coeff[4] = (-3 * b[0] + 3 * b[2]);                  //cx
   coeff[5] = (-3 * b[1] + 3 * b[3]);                  //cy
@@ -304,7 +304,7 @@ void compute_bezier_variable(int curve_index) {
 }
 
 //-----------compute the bezier curve from the 4 points-----------
-boolean compute_next_bezier_point(int curve_index) {
+boolean compute_next_bezier_point() {
   if (step_index >= numSteps)
     return false;
   pointX += firstFDX;
