@@ -13,9 +13,6 @@ const uint16_t START_LED_BLINK_ON = 100;//ms
 const uint16_t START_LED_BLINK_OFF = 200;//ms
 
 //==================IO pin define =======================
-// IO/pins definition (for used with arduino nono in V4 shield)
-// Amir_Explain.docx in J:\Amir Design\Demo and Gadgets\Stepper_Motor_Tester_Mars2023see
-// X is driver 0, Y is 1, Z is 2.
 const uint8_t MOVE_PIN[NUMBER_OF_MOVES] = {9, 16, 10, 15}; //push buttons to move (X+, X-, Y+, Y-, Z+, Z-) CHANGED IN 16 APR 2023
 const uint8_t DIR_PIN[NUMBER_OF_MOTORS] = {2, 3}; // original on V4 Shield
 const uint8_t STEP_PIN[NUMBER_OF_MOTORS] = {5, 6}; // original on V4 Shield
@@ -104,7 +101,7 @@ float thirdFDY = 0;
 
 
 #define BAUDRATE (115200)
-String in_command ="";//Amir code laser parsing 
+String in_command ="";
 
 
 #endif /* CONSTANTS_H */
