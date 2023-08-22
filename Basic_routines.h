@@ -27,7 +27,7 @@ void update_delta();
 void update_rates();
 
 void compute_bezier_variable(int);
-boolean compute_next_bezier_point(int);
+boolean compute_next_bezier_point();
 
 void go_home();
 void Homming();
