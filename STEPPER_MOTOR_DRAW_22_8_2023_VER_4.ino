@@ -1,10 +1,3 @@
-// Control 3 stepper motors based on SHIELD V4 and A4988 drivers - to move along linex acording to XYX array 
-// 27 Apr 2023 NO STRUCT only array version  
-// see J:\Amir Design\Demo and Gadgets\Stepper_Motor_Tester_Mars2023
-// arduino Nano, steper motor module driver A4988 (set current to about 0.05A at 12Volt when motor run/stop)
-// Array limit to TBD size 
-//===============================
-
 #include "Parser.h"
 
 void setup() {
@@ -34,6 +27,10 @@ void setup() {
   set_position(0, 0);
   update_rates();
   print_help_menu();
+  
+  curve_index = 0;
+  step_index = 0;
+  num_of_curves = 0;
 }
 
 void loop() {
@@ -43,18 +40,20 @@ void loop() {
   if (py_flag && num_of_curves > 0 && Is_destination_done && !drawing_curve) {
     compute_bezier_variable(curve_index);
     set_destination(bezier_point[0],bezier_point[1]);
-    Serial.println(bezier_point[0]);
-    Serial.println(bezier_point[1]);
+    print_destination();
+//    Serial.println(bezier_point[0]);
+//    Serial.println(bezier_point[1]);
     Is_destination_done = false;
     drawing_curve = true;
   }
   if (py_flag && num_of_curves > 0 && Is_destination_done && drawing_curve) {
-    if (compute_next_bezier_point(curve_index)) {
+    if (compute_next_bezier_point()) {
       led_on();
-      Serial.println();
-      Serial.println(bezier_point[0]);
-      Serial.println(bezier_point[1]);
+//      Serial.println();
+//      Serial.println(bezier_point[0]);
+//      Serial.println(bezier_point[1]);
       set_destination(bezier_point[0],bezier_point[1]);
+      print_destination();
       Is_destination_done = false;
     }
     else {
@@ -76,16 +75,36 @@ void loop() {
     process_in_command();
     in_command ="";
   }
+
+/*  
+  if (py_flag && !drawing_curve) {
+    num_of_curves = 1;
+    curves[0] = 50;
+    curves[1] = 50;
+    curves[2] = 50;
+    curves[3] = 150;
+    curves[4] = 100;
+    curves[5] = 150;
+    curves[6] = 100;
+    curves[7] = 50;
+    curve_index = 0;
+    step_index = 0;
+    drawing_curve = false;
+  } */
+
+  // to chane !pyflag to pyflag
   if (py_flag && !drawing_curve && Serial.available()) {
     float value;
     Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
-    Serial.println(value);
+//    if (value != 0.00)
+//      Serial.println(value);
     if (!start_flag) {
       // if arduino didnt get a starting key, check if it did now
       if (abs(value-starting_key) <= tolerance_float) {
       // arduino got a starting key from the python script
         start_flag = true;
         num_of_curves = 0;
+        curve_index = 0;
       }
     }
     else {
@@ -95,8 +114,8 @@ void loop() {
       }
       for (int i = 0; i < points_per_curve * num_of_curves; i++) {
         Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
-        curves[i] = value * mm_per_pixel[i%2];
-//        Serial.println(curves[i]);
+        curves[i] = value * mm_per_pixel[1-i%2];
+        Serial.println(curves[i]);
         if ((i+1) % points_per_curve == 0) {
           Serial.println(next_curve_key);
         }
@@ -108,10 +127,7 @@ void loop() {
       if (abs(value-end_key) <= tolerance_float) {
         start_flag = false;
         drawing_curve = false;
-//        Serial.println("testing:");
-//        Serial.println(curves[0]);
       }
     }
   }
-  
 }
