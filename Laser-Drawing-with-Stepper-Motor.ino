@@ -37,63 +37,18 @@ void loop() {
   
   update_rates();
 
-  if (py_flag && num_of_curves > 0 && Is_destination_done && !drawing_curve) {
-    compute_bezier_variable(curve_index);
-    set_destination(bezier_point[0],bezier_point[1]);
-    print_destination();
-//    Serial.println(bezier_point[0]);
-//    Serial.println(bezier_point[1]);
-    Is_destination_done = false;
-    drawing_curve = true;
-  }
-  if (py_flag && num_of_curves > 0 && Is_destination_done && drawing_curve) {
-    if (compute_next_bezier_point()) {
-      led_on();
-//      Serial.println();
-//      Serial.println(bezier_point[0]);
-//      Serial.println(bezier_point[1]);
-      set_destination(bezier_point[0],bezier_point[1]);
-      print_destination();
-      Is_destination_done = false;
-    }
-    else {
-      led_off();
-      drawing_curve = false;
-      curve_index++;
-      if (curve_index >= MAX_CURVES) {
-        num_of_curves = 0;
-        curve_index = 0;
-      }
-    }   
-  }
-
   if (!Is_destination_done) {
     read_destination();
   }
+ 
 //  read_pushbuttons();
   if (!py_flag && get_in_command()>0){
     process_in_command();
     in_command ="";
   }
 
-/*  
-  if (py_flag && !drawing_curve) {
-    num_of_curves = 1;
-    curves[0] = 50;
-    curves[1] = 50;
-    curves[2] = 50;
-    curves[3] = 150;
-    curves[4] = 100;
-    curves[5] = 150;
-    curves[6] = 100;
-    curves[7] = 50;
-    curve_index = 0;
-    step_index = 0;
-    drawing_curve = false;
-  } */
-
-  // to chane !pyflag to pyflag
-  if (py_flag && !drawing_curve && Serial.available()) {
+  // to change !py_flag to py_flag
+  if (py_flag && !drawing_curve && num_of_curves == 0 && Serial.available()) {
     float value;
     Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
 //    if (value != 0.00)
@@ -103,31 +58,68 @@ void loop() {
       if (abs(value-starting_key) <= tolerance_float) {
       // arduino got a starting key from the python script
         start_flag = true;
-        num_of_curves = 0;
         curve_index = 0;
       }
     }
     else {
       // if already got a starting key, check number of curves (it is negative to distinguish between this and the curve's points)
-      if (value < 0 && num_of_curves == 0) {
+      if (value < 0 && num_of_curves == 0)
         num_of_curves = -round(value);
-      }
-      for (int i = 0; i < points_per_curve * num_of_curves; i++) {
-        Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
-        curves[i] = value * mm_per_pixel[1-i%2];
-        Serial.println(curves[i]);
-        if ((i+1) % points_per_curve == 0) {
-          Serial.println(next_curve_key);
-        }
+    }
+  }
+  
+  if (py_flag && num_of_curves > 0 && Is_destination_done && !drawing_curve && Serial.available()) {
+    // read points for curve
+    float value;
+    delay(TIME_DELAY_ARDUINO);
+    for (int i = 0; i < points_per_curve; i++) {
+        Serial.readBytes((char *)&value, sizeof(value));
+        curves[i] = (value-border[1-i%2])* screen_scale[1-i%2]; //mm_per_pixel[1-i%2] *
+    }
+    Serial.println(finished_reading_key);    
+    compute_bezier_variable(0);
+    led_off();
+    set_destination(bezier_point[0],bezier_point[1]);
+    Is_destination_done = false;
+    drawing_curve = true;
+  }
+ 
+  if (py_flag && num_of_curves > 0 && Is_destination_done && drawing_curve) {
+    if (compute_next_bezier_point()) {
+      led_on();
+      set_destination(bezier_point[0],bezier_point[1]);
+//      print_destination();
+      Is_destination_done = false;
+    }
+    else {
+      led_off();
+      drawing_curve = false;
+//      curve_index++;
+      num_of_curves--;
+      if (num_of_curves > 0) {
+        Serial.println(next_curve_key);
         delay(TIME_DELAY_ARDUINO);
       }
-      Serial.println(end_key);
-      Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
-      Serial.println(value);
-      if (abs(value-end_key) <= tolerance_float) {
-        start_flag = false;
-        drawing_curve = false;
+      else {
+        float value;
+        Serial.println(end_key);
+        delay(TIME_DELAY_ARDUINO);
+        Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
+//        Serial.println(value);
+        if (abs(value-end_key) <= tolerance_float) {
+          start_flag = false;
+          drawing_curve = false;
+          num_of_curves = 0;
+          for (int i = 0; i < points_per_curve*MAX_CURVES; i++)
+            curves[i] = 0;
+          set_destination(0,0);
+          Is_destination_done = false;
+          Serial.println("Done!");
+        }
+        else {
+          Serial.println("ERROR - DIDNT GET END KEY");
+        }
       }
-    }
+    }   
   }
 }

@@ -6,6 +6,8 @@
 // X is driver 0, Y is 1, Z is 2.
 const int8_t NUMBER_OF_MOTORS = 2;//X, Y
 const int8_t NUMBER_OF_MOVES = 4;//X+, X-, Y+, Y-
+const float board_size[NUMBER_OF_MOTORS] = {83.0,83.0}; //mm
+const float screen_size[2] = {295.0,165.0}; //mm
 
 //=============start blink led parameters=================
 const uint8_t START_LED_BLINK_NUMBER = 3;
@@ -24,7 +26,7 @@ const uint8_t STEP_PIN[NUMBER_OF_MOTORS] = {5, 6}; // original on V4 Shield
 #define LASER_OUT 11 //pwn drive for laser
 
 const float MIN_POSITION[NUMBER_OF_MOTORS]={0,0};
-const float MAX_POSITION[NUMBER_OF_MOTORS]={178,228};
+const float MAX_POSITION[NUMBER_OF_MOTORS]={board_size[0],board_size[1]};
 //timming/rate parameters
 //const int8_t BOUNCE_TIME = 20;//ms
 const uint16_t DIRECTION_CHANGE_WAIT_TIME = 5; //[ms] time wait/stop move between change direction to avoid loos steps
@@ -35,19 +37,21 @@ const float TOLERANCE = 0.3;// ratio to mm per pulse tolerance for not move
 
 //----- global variable------------------
 
+float mm_per_pulse [NUMBER_OF_MOTORS]= {83.0/843,83.0/843}; //!!! nead to calibrate 
+float mm_per_pixel[NUMBER_OF_MOTORS] = {295.0/1366,165.0/768};
+float border[4] = {437.0,147.0,930.0,620}; //x,y, xMax,yMax
+float screen_scale[2] = {board_size[0]/(border[2]-border[0]), board_size[1]/(border[3]-border[1])};
+
 bool Is_destination_done = true;
 bool Is_Run_Command = false ; // true if system running/moving acording to serial port command 
 int16_t Current_Steps[NUMBER_OF_MOTORS] = {0, 0}; //can changed acording to number of motors (XYZ is 3)
 int16_t MIN_Steps [NUMBER_OF_MOTORS] = {0, 0};
-int16_t MAX_Steps [NUMBER_OF_MOTORS] = {3000, 3000};
-int16_t HOMMING_Steps [NUMBER_OF_MOTORS] = {880, 1130}; //x: ~880 y: ~1130
+int16_t MAX_Steps [NUMBER_OF_MOTORS] = {3500, 3500};
+int16_t HOMMING_Steps [NUMBER_OF_MOTORS] = {board_size[0]/mm_per_pulse[0], board_size[1]/mm_per_pulse[1]};
 
 float Current_Position[NUMBER_OF_MOTORS]={0.0,0.0};
 float destination[NUMBER_OF_MOTORS] ={0.0,0.0}; // nead to change name !!
 float Delta[NUMBER_OF_MOTORS] = {0.0,0.0};// sqrt(X^2+Y^2+Z^2)
-
-float mm_per_pulse [NUMBER_OF_MOTORS]= {225.0/1116,225.0/1116}; //!!! nead to calibrate 
-float mm_per_pixel[NUMBER_OF_MOTORS] = {295.0/1366,165.0/768};
 
 float max_delta [NUMBER_OF_MOTORS]= {TOLERANCE*abs(mm_per_pulse[0]),TOLERANCE*abs(mm_per_pulse[1])}; // max delat between current pos and destination  
 
@@ -72,16 +76,16 @@ const uint8_t squareY_step = 60/mm_per_pulse[1];
 const int points_per_curve = 8; //4*(x,y) - 8 floats total, DO NOT CHANGE
 const float tolerance_float = 0.1;
 const float starting_key = -2;
+const float finished_reading_key = -2.5;
 const float next_curve_key = -3;
 const float end_key = -4;
 const int numPoints = 30;
 const int numSteps = numPoints-1;
 const int TIME_DELAY_ARDUINO = 10;
 boolean drawing_curve = false;
-boolean py_flag = true;
 boolean start_flag = false;
 int num_of_curves = 0;
-const int MAX_CURVES = 15;
+const int MAX_CURVES = 3;
 //float curve[point_per_curve] = {};
 float curves[points_per_curve*MAX_CURVES] = {};
 int curve_index = 0;
@@ -98,6 +102,9 @@ float secondFDX = 0;
 float secondFDY = 0;
 float thirdFDX = 0;
 float thirdFDY = 0;
+
+
+boolean py_flag = true;
 
 
 #define BAUDRATE (115200)
