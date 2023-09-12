@@ -74,7 +74,7 @@ void loop() {
     delay(TIME_DELAY_ARDUINO);
     for (int i = 0; i < points_per_curve; i++) {
         Serial.readBytes((char *)&value, sizeof(value));
-        curves[i] = (value-border[1-i%2])* screen_scale[1-i%2]; //mm_per_pixel[1-i%2] *
+        curves[i] = (value-border[1-i%2])* screen_scale[1-i%2]; // * mm_per_pixel[1-i%2]
     }
     Serial.println(finished_reading_key);    
     compute_bezier_variable(0);

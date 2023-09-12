@@ -5,7 +5,8 @@ void read_pushbuttons(){
 //  if (digitalRead(IS_EN_JUMPER)!= 0) {digitalWrite(STEPPER_EN_PIN, HIGH);}   //disable motors if jumper not set 
   for(uint8_t i=0; i< NUMBER_OF_MOVES; ++i){
     if (digitalRead(MOVE_PIN[i])==0) { //check move (direction 0/false) pushbutton
-      if (is_position_valid()) {
+      if (is_position_valid(Current_Position[0] + (i==0?(mm_per_pulse[i/2]):(i==1?(-mm_per_pulse[i/2]):0))
+          ,Current_Position[1] + (i==2?(mm_per_pulse[i/2]):(i==3?(-mm_per_pulse[i/2]):0)))) {
         digitalWrite(STEPPER_EN_PIN, LOW);  //enable motors 
         if (millis() >= last_pulse_time[i/2]+XYZ_rates[i]){// time for another pulse 
           one_step (i/2, i%2);// make another pulse, odd or even direction False(+), True(-), False, True, False, True
@@ -51,6 +52,9 @@ void read_destination() {
         if (Delta[i] > 0 ? (Current_Position[i] < MAX_POSITION[i]) : (Current_Position[i] > MIN_POSITION[i])) {
           one_step (i, (Delta[i] > 0 ? false : true));// make another pulse, odd or even direction False(+), True(-), False, True, False, True
           last_pulse_time[2*i]= millis();// reset couner for continue steps rate 
+        }
+        else {
+          Is_destination_done = true;
         }
       }
     }
@@ -139,12 +143,9 @@ bool is_destination_valid() {
 }
 
 //--------check if position is in boundries---------
-bool is_position_valid(){
-  for (uint8_t i = 0; i < NUMBER_OF_MOTORS; i++) {
-    if (Current_Position[i] < MIN_POSITION[i] || Current_Position[i] > MAX_POSITION[i]) {
-      return false;
-    }
-  }
+bool is_position_valid(float x, float y){
+  if (x < MIN_POSITION[0] || x > MAX_POSITION[0] || y < MIN_POSITION[1] || y > MAX_POSITION[1])
+    return false;
   return true;
 }
 
@@ -165,13 +166,12 @@ void Limit_Steps_XYZ(){
 
 
 //----------move a motor one step-----------------
-void one_step(uint8_t motor_No, bool move_direction)
-  {
-    if (move_direction != motor_direction[motor_No]){
-        motor_direction[motor_No] = move_direction ;// change motor direction
-        digitalWrite(DIR_PIN[motor_No],move_direction);
-        delay (DIRECTION_CHANGE_WAIT_TIME);// wait to IO stable   
-    }
+void one_step(uint8_t motor_No, bool move_direction) {
+  if (move_direction != motor_direction[motor_No]){
+      motor_direction[motor_No] = move_direction ;// change motor direction
+      digitalWrite(DIR_PIN[motor_No],move_direction);
+      delay (DIRECTION_CHANGE_WAIT_TIME);// wait to IO stable   
+  }
   digitalWrite(STEP_PIN[motor_No], HIGH);
   delayMicroseconds(2);// for fasr processors may not need with ATMEGA
   digitalWrite(STEP_PIN[motor_No], LOW);

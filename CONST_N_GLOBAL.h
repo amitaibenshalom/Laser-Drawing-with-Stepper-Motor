@@ -37,10 +37,10 @@ const float TOLERANCE = 0.3;// ratio to mm per pulse tolerance for not move
 
 //----- global variable------------------
 
-float mm_per_pulse [NUMBER_OF_MOTORS]= {83.0/843,83.0/843}; //!!! nead to calibrate 
+float mm_per_pulse [NUMBER_OF_MOTORS]= {83.0/843,83.0/843};
 float mm_per_pixel[NUMBER_OF_MOTORS] = {295.0/1366,165.0/768};
-float border[4] = {437.0,147.0,930.0,620}; //x,y, xMax,yMax
-float screen_scale[2] = {board_size[0]/(border[2]-border[0]), board_size[1]/(border[3]-border[1])};
+float border[4] = {437.0,147.0,930.0,620}; //x,y, xMax,yMax - all in pixels
+float screen_scale[2] = {board_size[0]/(border[2]-border[0]), board_size[1]/(border[3]-border[1])};   // units: mm/pixel
 
 bool Is_destination_done = true;
 bool Is_Run_Command = false ; // true if system running/moving acording to serial port command 

@@ -8,7 +8,7 @@ void read_destination();
 void one_step(uint8_t, bool);
 bool in_destination();
 bool is_destination_valid();
-bool is_position_valid();
+bool is_position_valid(float, float);
 
 void set_steps(int16_t, int16_t);
 void set_position(float, float);
