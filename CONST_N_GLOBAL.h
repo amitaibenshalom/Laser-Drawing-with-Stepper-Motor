@@ -24,6 +24,7 @@ const uint8_t STEP_PIN[NUMBER_OF_MOTORS] = {5, 6}; // original on V4 Shield
 #define SPEED_POT_INPUT_PIN A6 // analog read IO mark A6 on shield 
 #define LED_OUT 13// also internal led
 #define LASER_OUT 11 //pwm drive for laser
+#define DC_MOTOR_OUT 10 //pwm drive for dc motor
 
 const float MIN_POSITION[NUMBER_OF_MOTORS]={0,0};
 const float MAX_POSITION[NUMBER_OF_MOTORS]={board_size[0],board_size[1]};

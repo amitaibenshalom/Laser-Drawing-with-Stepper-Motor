@@ -19,9 +19,11 @@ void setup() {
     pinMode(STEP_PIN[i],OUTPUT);
     digitalWrite(STEP_PIN[i],LOW);// pulse low 
   }
-  for (uint8_t i=0; i<NUMBER_OF_MOVES; i++) {
-    pinMode(MOVE_PIN[i],INPUT_PULLUP);    
-  }
+//  for (uint8_t i=0; i<NUMBER_OF_MOVES; i++) {
+//    pinMode(MOVE_PIN[i],INPUT_PULLUP);    
+//  }
+  pinMode(DC_MOTOR_OUT,OUTPUT);
+  digitalWrite(DC_MOTOR_OUT,LOW);
   Homming();
   set_steps(0,0);// set (define) current (steps) position 
   set_position(0, 0);
