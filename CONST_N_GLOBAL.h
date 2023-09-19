@@ -23,7 +23,7 @@ const uint8_t STEP_PIN[NUMBER_OF_MOTORS] = {5, 6}; // original on V4 Shield
 #define STEPPER_EN_PIN 8 // invert - Hige is disable, low enable this is for all 3 drivers/motors
 #define SPEED_POT_INPUT_PIN A6 // analog read IO mark A6 on shield 
 #define LED_OUT 13// also internal led
-#define LASER_OUT 11 //pwn drive for laser
+#define LASER_OUT 11 //pwm drive for laser
 
 const float MIN_POSITION[NUMBER_OF_MOTORS]={0,0};
 const float MAX_POSITION[NUMBER_OF_MOTORS]={board_size[0],board_size[1]};
