@@ -17,8 +17,12 @@ void process_in_command()
     else if ((in_command.length() == 7)&&(in_command.substring(0,7) == "LED OFF")) {led_off(); Serial.println("led is OFF");} 
     else if ((in_command.length() == 6) && (in_command.substring(0,6) == "SQUARE")) {square();}
     else if ((in_command.length() == 8) && (in_command.substring(0,4) == "RATE")) {read_rate();}
-    else if ((in_command.length() == 2) && (in_command.substring(0,2) == "PY")) {py_flag = true; Serial.println("Input is only from python now");}
-    else if ((in_command.length() == 3) && (in_command.substring(0,3) == "EPY")) {py_flag = false;Serial.println("Input is only from serial monitor now");}
+    else if ((in_command.length() == 2) && (in_command.substring(0,2) == "PY")) {py_flag = true; Serial.println("INPUT IS ONLY FROM PYTHON NOW AND CANNOT BE CHANGED BACK");}
+//    else if ((in_command.length() == 3) && (in_command.substring(0,3) == "EPY")) {py_flag = false;Serial.println("Input is only from serial monitor now");}
+    else if ((in_command.length() == 10) && (in_command.substring(0,6) == "DPOWER")) {read_dpower();}
+    else if ((in_command.length() == 10)&& (in_command.substring(0,10) == "DCMOTOR ON")) {dc_motor_on(); Serial.println("DC motor is ON");} 
+    else if ((in_command.length() == 11)&&(in_command.substring(0,11) == "DCMOTOR OFF")) {dc_motor_off(); Serial.println("DC motor is OFF");} 
+    
 }
 
 void print_help_menu()  {
@@ -37,7 +41,11 @@ void print_help_menu()  {
     "|  LED ON - turn the led on                                      |\n"
     "|  LED OFF - turn the led off                                    |\n"
     "|  SQUARE - draw a sqare                                         |\n"
-    "|  RATE *** - change rate (* is a digit)                         |\n"
+    "|  RATE *** - change rate of XY motors (* is a digit)            |\n"
+    "|  DPOWER *** - change rate of DC motor (000 <= *** <= 255)      |\n"
+    "|  DCMOTOR ON - turn on DC motor                                 |\n"
+    "|  DCMOTOR OFF - turn off DC motor                               |\n"
+    "|  PY - INPUT FROM PYTHON ONLY, THIS MONITOR WILL BE DISABLED!!  |\n"
     "|________________________________________________________________|\n"
   ));
 }
@@ -49,7 +57,8 @@ void read_power() {
   if (in_command.substring(6,9).toInt() != 0 || in_command.substring(6,9) == "000") {
       if (in_command.substring(6,9).toInt() <= 255 && in_command.substring(6,9).toInt() >= 0) {
         laser_power = in_command.substring(6,9).toInt();
-//        led_on();
+        if (is_laser_on)
+          led_on();
         Serial.print("power of laser is now: ");
         Serial.println(laser_power);
       }
@@ -62,6 +71,26 @@ void read_power() {
     }
 }
 
+
+//----------parse dc motor power (speed)----------
+void read_dpower() {
+  int new_dpower = dc_motor_power;
+  if (in_command.substring(7,10).toInt() != 0 || in_command.substring(7,10) == "000") {
+      if (in_command.substring(7,10).toInt() <= 255 && in_command.substring(7,10).toInt() >= 0) {
+        dc_motor_power = in_command.substring(7,10).toInt();
+        if (is_dc_motor_on)
+          dc_motor_on();
+        Serial.print("power of DC motor is now: ");
+        Serial.println(dc_motor_power);
+      }
+      else {
+        Serial.print("value out of range (000 - 255)");
+      }
+    }
+    else { 
+      Serial.println("power not valid");
+    }
+}
 
 //----------parse rate---------------------
 void read_rate() {

@@ -236,14 +236,36 @@ void square() {
 void led_on() {
   digitalWrite(LED_OUT, HIGH);
   analogWrite(LASER_OUT, laser_power);
-
+  is_laser_on = true;
 }
 
 //-------turn led off---------------
 void led_off() {
   digitalWrite(LED_OUT, LOW);
   analogWrite(LASER_OUT, 0);
+  is_laser_on = false;
 
+}
+
+
+//-------turn DC motor on---------------------
+void dc_motor_on() {
+  analogWrite(DC_MOTOR_OUT, dc_motor_power);
+  is_dc_motor_on = true;
+}
+
+//-------turn DC motor off--------------------
+void dc_motor_off() {
+  analogWrite(DC_MOTOR_OUT, 0);
+  is_dc_motor_on = false;
+}
+
+
+//--------check if need to turn off DC motor-----
+void check_dc_motor() {
+  if (millis() - last_time_dc_motor > MAX_DC_MOTOR_TIME) {
+    dc_motor_off();
+  }
 }
 
 //-------blink led XX times, Ton , Toff) --------------------

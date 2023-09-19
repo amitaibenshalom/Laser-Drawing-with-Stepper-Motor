@@ -38,4 +38,8 @@ void Blink_Led(uint8_t, uint16_t, uint16_t);
 void led_on();
 void led_off();
 
+void dc_motor_on();
+void dc_motor_off();
+void check_dc_motor();
+
 #endif /* BASIC_ROUTINES_H */

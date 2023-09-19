@@ -57,6 +57,7 @@ float Delta[NUMBER_OF_MOTORS] = {0.0,0.0};// sqrt(X^2+Y^2+Z^2)
 float max_delta [NUMBER_OF_MOTORS]= {TOLERANCE*abs(mm_per_pulse[0]),TOLERANCE*abs(mm_per_pulse[1])}; // max delat between current pos and destination  
 
 byte laser_power = 255;
+byte dc_motor_power = 255;
 uint16_t rate = MIN_RATE; // register hold rate (read from potentiometer)
 bool is_PBs_Preased = false ; // for enable/disable motoers if no PB plreased
 // array for each parameter one variable for each motor (usealy only 3)
@@ -66,6 +67,12 @@ uint32_t last_pulse_time[NUMBER_OF_MOVES] = {0, 0, 0, 0}; // !! nead to update a
 uint16_t XYZ_prop_rates [NUMBER_OF_MOVES] = {MIN_RATE, MIN_RATE, MIN_RATE, MIN_RATE}; // proportinal rates
 uint16_t XYZ_rates [NUMBER_OF_MOVES] = {MIN_RATE, MIN_RATE, MIN_RATE, MIN_RATE}; // initial value same rates
 uint16_t XYZ_homming_rates [NUMBER_OF_MOVES] = {HOMMING_RATE, HOMMING_RATE, HOMMING_RATE, HOMMING_RATE}; // initial value same rates
+
+uint32_t last_time_dc_motor = 0;
+const int MAX_DC_MOTOR_TIME = 10000;
+
+bool is_laser_on = false;
+bool is_dc_motor_on = false;
 
 const uint8_t squareX_step = 60/mm_per_pulse[0];
 const uint8_t squareY_step = 60/mm_per_pulse[1];

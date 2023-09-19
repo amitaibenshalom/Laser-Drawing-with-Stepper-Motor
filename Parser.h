@@ -8,6 +8,7 @@ void print_help_menu();
 void read_xyz();
 void read_rate();
 void read_power();
+void read_dpower();
 byte get_in_command();
 
 #endif /* PARSER_H */
