@@ -19,9 +19,11 @@ void setup() {
     pinMode(STEP_PIN[i],OUTPUT);
     digitalWrite(STEP_PIN[i],LOW);// pulse low 
   }
-  for (uint8_t i=0; i<NUMBER_OF_MOVES; i++) {
-    pinMode(MOVE_PIN[i],INPUT_PULLUP);    
-  }
+//  for (uint8_t i=0; i<NUMBER_OF_MOVES; i++) {
+//    pinMode(MOVE_PIN[i],INPUT_PULLUP);    
+//  }
+  pinMode(DC_MOTOR_OUT,OUTPUT);
+  digitalWrite(DC_MOTOR_OUT,LOW);
   Homming();
   set_steps(0,0);// set (define) current (steps) position 
   set_position(0, 0);
@@ -36,6 +38,8 @@ void setup() {
 void loop() {
   
   update_rates();
+  if (py_flag)
+    check_dc_motor();
 
   if (!Is_destination_done) {
     read_destination();
@@ -59,6 +63,7 @@ void loop() {
       // arduino got a starting key from the python script
         start_flag = true;
         curve_index = 0;
+        dc_motor_off();
       }
     }
     else {
@@ -119,6 +124,8 @@ void loop() {
         else {
           Serial.println("ERROR - DIDNT GET END KEY");
         }
+        dc_motor_on();
+        last_time_dc_motor = millis();
       }
     }   
   }
