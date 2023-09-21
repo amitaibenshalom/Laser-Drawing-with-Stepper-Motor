@@ -34,6 +34,8 @@ void Homming();
 
 void square();
 
+void update_scales();
+
 void Blink_Led(uint8_t, uint16_t, uint16_t);
 void led_on();
 void led_off();

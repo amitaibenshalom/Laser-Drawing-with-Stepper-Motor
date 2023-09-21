@@ -232,6 +232,13 @@ void Homming(){
 void square() {
 }
 
+
+//----update scales-----------------
+void update_scales() {
+  screen_scale[0] = board_size[0]/(border[2]-border[0]);
+  screen_scale[1] = board_size[1]/(border[3]-border[1]);
+}
+
 //-------turn led on----------------
 void led_on() {
   digitalWrite(LED_OUT, HIGH);

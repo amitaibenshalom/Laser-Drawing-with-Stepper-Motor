@@ -29,19 +29,21 @@ const uint8_t STEP_PIN[NUMBER_OF_MOTORS] = {5, 6}; // original on V4 Shield
 const float MIN_POSITION[NUMBER_OF_MOTORS]={0,0};
 const float MAX_POSITION[NUMBER_OF_MOTORS]={board_size[0],board_size[1]};
 //timming/rate parameters
-//const int8_t BOUNCE_TIME = 20;//ms
 const uint16_t DIRECTION_CHANGE_WAIT_TIME = 5; //[ms] time wait/stop move between change direction to avoid loos steps
 const uint16_t MIN_RATE = 6; //ms - minimum time between steps pulses - faster speed
-const uint16_t MAX_RATE = 100; //ms - maximum, time between steps pulses - slower speed
+const uint16_t MAX_RATE = 150; //ms - maximum, time between steps pulses - slower speed
 const uint16_t HOMMING_RATE  = MIN_RATE ; //ms -
-const float TOLERANCE = 0.3;// ratio to mm per pulse tolerance for not move 
+const float TOLERANCE = 0.1;// ratio to mm per pulse tolerance for not move 
 
 //----- global variable------------------
 
-float mm_per_pulse [NUMBER_OF_MOTORS]= {83.0/843,83.0/843};
+// float mm_per_pulse[NUMBER_OF_MOTORS]= {83.0/843,83.0/843};
+float mm_per_pulse[NUMBER_OF_MOTORS]= {2*83.0/843,2*83.0/843};
 float mm_per_pixel[NUMBER_OF_MOTORS] = {295.0/1366,165.0/768};
 float border[4] = {437.0,147.0,930.0,620}; //x,y, xMax,yMax - all in pixels
 float screen_scale[2] = {board_size[0]/(border[2]-border[0]), board_size[1]/(border[3]-border[1])};   // units: mm/pixel
+
+int param_index = 0;
 
 bool Is_destination_done = true;
 bool Is_Run_Command = false ; // true if system running/moving acording to serial port command 
@@ -59,6 +61,13 @@ float max_delta [NUMBER_OF_MOTORS]= {TOLERANCE*abs(mm_per_pulse[0]),TOLERANCE*ab
 byte laser_power = 255;
 byte dc_motor_power = 255;
 uint16_t rate = MIN_RATE; // register hold rate (read from potentiometer)
+
+byte LASER_ON_POWER = 255;
+byte CONTOUR_POWER = 255;
+uint16_t LASER_OFF_RATE = MIN_RATE;
+uint16_t LASER_ON_RATE = 80;
+uint16_t CONTOUR_RATE = 80;
+
 bool is_PBs_Preased = false ; // for enable/disable motoers if no PB plreased
 // array for each parameter one variable for each motor (usealy only 3)
 bool motor_direction[NUMBER_OF_MOTORS] = {false, false}; // initialy asume arbitary direction - false count pulses down
@@ -93,7 +102,7 @@ const int TIME_DELAY_ARDUINO = 10;
 boolean drawing_curve = false;
 boolean start_flag = false;
 int num_of_curves = 0;
-const int MAX_CURVES = 3;
+const int MAX_CURVES = 2; // can be 1 but 2 for safety
 //float curve[point_per_curve] = {};
 float curves[points_per_curve*MAX_CURVES] = {};
 int curve_index = 0;
@@ -112,7 +121,8 @@ float thirdFDX = 0;
 float thirdFDY = 0;
 
 
-boolean py_flag = true;
+bool py_flag = false;
+bool got_param = false;
 
 
 #define BAUDRATE (115200)

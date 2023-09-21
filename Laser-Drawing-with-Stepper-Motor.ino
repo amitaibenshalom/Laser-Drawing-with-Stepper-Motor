@@ -3,8 +3,7 @@
 void setup() {
   Serial.begin(BAUDRATE);
   delay (1000);// wait to make sure serial begin 
-  Serial.println(F(__FILE__ " " __DATE__ " " __TIME__));
-  Serial.println("START");
+  
  
   pinMode(IS_EN_JUMPER,INPUT_PULLUP);// jumper to GND for constant hold/active  motors    
   pinMode(STEPPER_EN_PIN, OUTPUT);// invert !
@@ -28,15 +27,52 @@ void setup() {
   set_steps(0,0);// set (define) current (steps) position 
   set_position(0, 0);
   update_rates();
-  print_help_menu();
   
+  // Serial.println(F(__FILE__ " " __DATE__ " " __TIME__));
+  Serial.println("START");
+  // if (!py_flag)
+  //  print_help_menu();
   curve_index = 0;
   step_index = 0;
   num_of_curves = 0;
+  got_param = false;
+  param_index = 0;
 }
 
 void loop() {
-  
+
+  //  read_pushbuttons();
+  if (!py_flag && get_in_command()>0){
+    process_in_command();
+    in_command ="";
+  }
+
+// get all the initial parameters from python. The first 4 are the border values of the drawing area (X_left, Y_up, X_right, Y_down) in the screen (the grey box on the python)
+  if (py_flag && !got_param && Serial.available()) {
+    float value;
+    Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
+    Serial.println(value);
+    if (param_index < 4) {
+      border[param_index] = value;
+    }
+    else {
+      switch(param_index) {
+        case 4: LASER_ON_POWER = value; update_scales(); break;
+        case 5: CONTOUR_POWER = value; break;
+        case 6: LASER_OFF_RATE = value; break;
+        case 7: LASER_ON_RATE = value; break;
+        case 8: CONTOUR_RATE = value; break;
+        default: Serial.println("ERROR IN GETTING PARAMETERS"); break;
+      }
+    }
+    param_index++;
+    if (param_index > 8) {
+      got_param = true;
+      param_index = 0;
+      Serial.println("got all parameters - Im good to go");
+    }
+  }
+
   update_rates();
   if (py_flag)
     check_dc_motor();
@@ -44,19 +80,13 @@ void loop() {
   if (!Is_destination_done) {
     read_destination();
   }
- 
-//  read_pushbuttons();
-  if (!py_flag && get_in_command()>0){
-    process_in_command();
-    in_command ="";
-  }
 
   // to change !py_flag to py_flag
-  if (py_flag && !drawing_curve && num_of_curves == 0 && Serial.available()) {
+  if (py_flag && !drawing_curve && got_param && num_of_curves == 0 && Serial.available()) {
     float value;
     Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
-//    if (value != 0.00)
-//      Serial.println(value);
+    // if (value != 0.00)
+    //   Serial.println(value);
     if (!start_flag) {
       // if arduino didnt get a starting key, check if it did now
       if (abs(value-starting_key) <= tolerance_float) {
@@ -91,6 +121,11 @@ void loop() {
  
   if (py_flag && num_of_curves > 0 && Is_destination_done && drawing_curve) {
     if (compute_next_bezier_point()) {
+      // if (num_of_curves == 1) // TODO: CONTOUR
+      //   rate = CONTOUR_RATE;
+      // else
+      //   rate = LASER_ON_RATE;
+      rate = LASER_ON_RATE;
       led_on();
       set_destination(bezier_point[0],bezier_point[1]);
 //      print_destination();
@@ -98,6 +133,7 @@ void loop() {
     }
     else {
       led_off();
+      rate = LASER_OFF_RATE;
       drawing_curve = false;
 //      curve_index++;
       num_of_curves--;
