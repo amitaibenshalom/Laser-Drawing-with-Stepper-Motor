@@ -102,6 +102,7 @@ const int TIME_DELAY_ARDUINO = 10;
 boolean drawing_curve = false;
 boolean start_flag = false;
 int num_of_curves = 0;
+int num_of_contour = 0;
 const int MAX_CURVES = 2; // can be 1 but 2 for safety
 //float curve[point_per_curve] = {};
 float curves[points_per_curve*MAX_CURVES] = {};

@@ -82,7 +82,7 @@ void loop() {
   }
 
   // to change !py_flag to py_flag
-  if (py_flag && !drawing_curve && got_param && num_of_curves == 0 && Serial.available()) {
+  if (py_flag && !drawing_curve && got_param && (num_of_contour == 0 || num_of_curves == 0) && Serial.available()) {
     float value;
     Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
     // if (value != 0.00)
@@ -100,10 +100,12 @@ void loop() {
       // if already got a starting key, check number of curves (it is negative to distinguish between this and the curve's points)
       if (value < 0 && num_of_curves == 0)
         num_of_curves = -round(value);
+      else if (value < 0 && num_of_contour == 0) 
+        num_of_contour = -round(value);
     }
   }
   
-  if (py_flag && num_of_curves > 0 && Is_destination_done && !drawing_curve && Serial.available()) {
+  if (py_flag && num_of_curves > 0 && num_of_contour > 0&& Is_destination_done && !drawing_curve && Serial.available()) {
     // read points for curve
     float value;
     delay(TIME_DELAY_ARDUINO);
@@ -119,13 +121,16 @@ void loop() {
     drawing_curve = true;
   }
  
-  if (py_flag && num_of_curves > 0 && Is_destination_done && drawing_curve) {
+  if (py_flag && num_of_curves > 0 && num_of_contour > 0 && Is_destination_done && drawing_curve) {
     if (compute_next_bezier_point()) {
-      // if (num_of_curves == 1) // TODO: CONTOUR
-      //   rate = CONTOUR_RATE;
-      // else
-      //   rate = LASER_ON_RATE;
-      rate = LASER_ON_RATE;
+      if (num_of_curves <= num_of_contour) {
+        rate = CONTOUR_RATE;
+        laser_power = CONTOUR_POWER;
+      }
+      else {
+        rate = LASER_ON_RATE;
+        laser_power = LASER_ON_POWER;
+      }
       led_on();
       set_destination(bezier_point[0],bezier_point[1]);
 //      print_destination();
@@ -148,9 +153,9 @@ void loop() {
         Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
 //        Serial.println(value);
         if (abs(value-end_key) <= tolerance_float) {
-          start_flag = false;
-          drawing_curve = false;
-          num_of_curves = 0;
+          // start_flag = false;
+          // drawing_curve = false;
+          // num_of_contour = 0;
           for (int i = 0; i < points_per_curve*MAX_CURVES; i++)
             curves[i] = 0;
           set_destination(0,0);
@@ -160,6 +165,9 @@ void loop() {
         else {
           Serial.println("ERROR - DIDNT GET END KEY");
         }
+        start_flag = false;
+        drawing_curve = false;
+        num_of_contour = 0;
         dc_motor_on();
         last_time_dc_motor = millis();
       }
