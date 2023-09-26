@@ -35,6 +35,7 @@ void setup() {
   curve_index = 0;
   step_index = 0;
   num_of_curves = 0;
+  num_of_contour = 0;
   got_param = false;
   param_index = 0;
 }
@@ -94,6 +95,8 @@ void loop() {
         start_flag = true;
         curve_index = 0;
         dc_motor_off();
+        led_off();
+        rate = LASER_OFF_RATE;
       }
     }
     else {
@@ -105,7 +108,7 @@ void loop() {
     }
   }
   
-  if (py_flag && num_of_curves > 0 && num_of_contour > 0&& Is_destination_done && !drawing_curve && Serial.available()) {
+  if (py_flag && num_of_curves > 0 && num_of_contour > 0 && Is_destination_done && !drawing_curve && Serial.available()) {
     // read points for curve
     float value;
     delay(TIME_DELAY_ARDUINO);
@@ -116,6 +119,7 @@ void loop() {
     Serial.println(finished_reading_key);    
     compute_bezier_variable(0);
     led_off();
+    rate = LASER_OFF_RATE;
     set_destination(bezier_point[0],bezier_point[1]);
     Is_destination_done = false;
     drawing_curve = true;
@@ -153,9 +157,9 @@ void loop() {
         Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
 //        Serial.println(value);
         if (abs(value-end_key) <= tolerance_float) {
-          // start_flag = false;
-          // drawing_curve = false;
-          // num_of_contour = 0;
+          start_flag = false;
+          drawing_curve = false;
+          num_of_contour = 0;
           for (int i = 0; i < points_per_curve*MAX_CURVES; i++)
             curves[i] = 0;
           set_destination(0,0);
@@ -165,9 +169,6 @@ void loop() {
         else {
           Serial.println("ERROR - DIDNT GET END KEY");
         }
-        start_flag = false;
-        drawing_curve = false;
-        num_of_contour = 0;
         dc_motor_on();
         last_time_dc_motor = millis();
       }
