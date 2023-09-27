@@ -35,6 +35,7 @@ void setup() {
   curve_index = 0;
   step_index = 0;
   num_of_curves = 0;
+  num_of_contour = 0;
   got_param = false;
   param_index = 0;
 }
@@ -82,7 +83,7 @@ void loop() {
   }
 
   // to change !py_flag to py_flag
-  if (py_flag && !drawing_curve && got_param && num_of_curves == 0 && Serial.available()) {
+  if (py_flag && !drawing_curve && got_param && (num_of_contour == 0 || num_of_curves == 0) && Serial.available()) {
     float value;
     Serial.readBytes((char *)&value, sizeof(value)); // Read the float value from serial
     // if (value != 0.00)
@@ -94,16 +95,20 @@ void loop() {
         start_flag = true;
         curve_index = 0;
         dc_motor_off();
+        led_off();
+        rate = LASER_OFF_RATE;
       }
     }
     else {
       // if already got a starting key, check number of curves (it is negative to distinguish between this and the curve's points)
       if (value < 0 && num_of_curves == 0)
         num_of_curves = -round(value);
+      else if (value < 0 && num_of_contour == 0) 
+        num_of_contour = -round(value);
     }
   }
   
-  if (py_flag && num_of_curves > 0 && Is_destination_done && !drawing_curve && Serial.available()) {
+  if (py_flag && num_of_curves > 0 && num_of_contour > 0 && Is_destination_done && !drawing_curve && Serial.available()) {
     // read points for curve
     float value;
     delay(TIME_DELAY_ARDUINO);
@@ -114,21 +119,30 @@ void loop() {
     Serial.println(finished_reading_key);    
     compute_bezier_variable(0);
     led_off();
+    rate = LASER_OFF_RATE;
     set_destination(bezier_point[0],bezier_point[1]);
     Is_destination_done = false;
     drawing_curve = true;
   }
  
-  if (py_flag && num_of_curves > 0 && Is_destination_done && drawing_curve) {
+  if (py_flag && num_of_curves > 0 && num_of_contour > 0 && Is_destination_done && drawing_curve) {
     if (compute_next_bezier_point()) {
-      // if (num_of_curves == 1) // TODO: CONTOUR
-      //   rate = CONTOUR_RATE;
-      // else
-      //   rate = LASER_ON_RATE;
-      rate = LASER_ON_RATE;
-      led_on();
+      if (in_destination()) {
+        if (num_of_curves <= num_of_contour) {
+        rate = CONTOUR_RATE;
+        laser_power = CONTOUR_POWER;
+        }
+        else {
+          rate = LASER_ON_RATE;
+          laser_power = LASER_ON_POWER;
+        }
+        led_on();
+      }
+      else {
+        led_off();
+        rate = LASER_OFF_RATE;
+      }
       set_destination(bezier_point[0],bezier_point[1]);
-//      print_destination();
       Is_destination_done = false;
     }
     else {
@@ -150,7 +164,7 @@ void loop() {
         if (abs(value-end_key) <= tolerance_float) {
           start_flag = false;
           drawing_curve = false;
-          num_of_curves = 0;
+          num_of_contour = 0;
           for (int i = 0; i < points_per_curve*MAX_CURVES; i++)
             curves[i] = 0;
           set_destination(0,0);
