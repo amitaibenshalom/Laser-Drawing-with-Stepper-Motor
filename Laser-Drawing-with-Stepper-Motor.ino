@@ -127,17 +127,22 @@ void loop() {
  
   if (py_flag && num_of_curves > 0 && num_of_contour > 0 && Is_destination_done && drawing_curve) {
     if (compute_next_bezier_point()) {
-      if (num_of_curves <= num_of_contour) {
+      if (in_destination()) {
+        if (num_of_curves <= num_of_contour) {
         rate = CONTOUR_RATE;
         laser_power = CONTOUR_POWER;
+        }
+        else {
+          rate = LASER_ON_RATE;
+          laser_power = LASER_ON_POWER;
+        }
+        led_on();
       }
       else {
-        rate = LASER_ON_RATE;
-        laser_power = LASER_ON_POWER;
+        led_off();
+        rate = LASER_OFF_RATE;
       }
-      led_on();
       set_destination(bezier_point[0],bezier_point[1]);
-//      print_destination();
       Is_destination_done = false;
     }
     else {
