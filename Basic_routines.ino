@@ -222,6 +222,13 @@ void Homming(){
     delay(XYZ_homming_rates[2*j]);
     }
   }
+  // move to the center
+  for(int16_t j=0; j< NUMBER_OF_MOTORS; ++j){
+    for(int16_t i=0; i < STEPS_TO_CENTER; ++i){
+    one_step(j,false);
+    delay(XYZ_homming_rates[2*j]);
+    }
+  }
   set_position(0,0);
   set_steps(0,0);
   if (digitalRead(IS_EN_JUMPER)!= 0) {digitalWrite(STEPPER_EN_PIN, HIGH);}   //disable motors if jumper not set 

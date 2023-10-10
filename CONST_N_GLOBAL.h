@@ -38,7 +38,7 @@ const float TOLERANCE = 0.1;// ratio to mm per pulse tolerance for not move
 //----- global variable------------------
 
 // float mm_per_pulse[NUMBER_OF_MOTORS]= {83.0/843,83.0/843};
-float mm_per_pulse[NUMBER_OF_MOTORS]= {2*83.0/843,2*83.0/843};
+float mm_per_pulse[NUMBER_OF_MOTORS]= {2*80.0/800,2*80.0/800};
 float mm_per_pixel[NUMBER_OF_MOTORS] = {295.0/1366,165.0/768};
 float border[4] = {437.0,147.0,930.0,620}; //x,y, xMax,yMax - all in pixels
 float screen_scale[2] = {board_size[0]/(border[2]-border[0]), board_size[1]/(border[3]-border[1])};   // units: mm/pixel
@@ -51,6 +51,7 @@ int16_t Current_Steps[NUMBER_OF_MOTORS] = {0, 0}; //can changed acording to numb
 int16_t MIN_Steps [NUMBER_OF_MOTORS] = {0, 0};
 int16_t MAX_Steps [NUMBER_OF_MOTORS] = {3500, 3500};
 int16_t HOMMING_Steps [NUMBER_OF_MOTORS] = {board_size[0]/mm_per_pulse[0], board_size[1]/mm_per_pulse[1]};
+int16_t STEPS_TO_CENTER = 100;
 
 float Current_Position[NUMBER_OF_MOTORS]={0.0,0.0};
 float destination[NUMBER_OF_MOTORS] ={0.0,0.0}; // nead to change name !!
@@ -88,6 +89,8 @@ const uint8_t squareY_step = 60/mm_per_pulse[1];
 
 //const int BUFFER_SIZE = 10;
 //float BUFFER[2*BUFFER_SIZE] = {};
+
+const float start_point[NUMBER_OF_MOTORS] = {30.0,30.0}; //mm
 
 //------------bezier related ---------------------
 const int points_per_curve = 8; //4*(x,y) - 8 floats total, DO NOT CHANGE
