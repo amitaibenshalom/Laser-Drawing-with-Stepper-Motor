@@ -69,6 +69,8 @@ uint16_t LASER_OFF_RATE = MIN_RATE;
 uint16_t LASER_ON_RATE = 80;
 uint16_t CONTOUR_RATE = 80;
 
+uint16_t TIME_DELAY_FOR_CONTOUR_CUTTING = 110; // delay in ms for letting the laser stay on a little longer for contour to be cut properly 
+
 bool is_PBs_Preased = false ; // for enable/disable motoers if no PB plreased
 // array for each parameter one variable for each motor (usealy only 3)
 bool motor_direction[NUMBER_OF_MOTORS] = {false, false}; // initialy asume arbitary direction - false count pulses down
