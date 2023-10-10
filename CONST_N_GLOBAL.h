@@ -51,6 +51,7 @@ int16_t Current_Steps[NUMBER_OF_MOTORS] = {0, 0}; //can changed acording to numb
 int16_t MIN_Steps [NUMBER_OF_MOTORS] = {0, 0};
 int16_t MAX_Steps [NUMBER_OF_MOTORS] = {3500, 3500};
 int16_t HOMMING_Steps [NUMBER_OF_MOTORS] = {board_size[0]/mm_per_pulse[0], board_size[1]/mm_per_pulse[1]};
+int16_t STEPS_TO_CENTER = 100;
 
 float Current_Position[NUMBER_OF_MOTORS]={0.0,0.0};
 float destination[NUMBER_OF_MOTORS] ={0.0,0.0}; // nead to change name !!

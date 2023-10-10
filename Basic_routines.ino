@@ -224,7 +224,7 @@ void Homming(){
   }
   // move to the center
   for(int16_t j=0; j< NUMBER_OF_MOTORS; ++j){
-    for(int16_t i=0; i < 100; ++i){
+    for(int16_t i=0; i < STEPS_TO_CENTER; ++i){
     one_step(j,false);
     delay(XYZ_homming_rates[2*j]);
     }
