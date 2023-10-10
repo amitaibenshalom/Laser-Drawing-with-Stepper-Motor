@@ -137,6 +137,9 @@ void loop() {
           laser_power = LASER_ON_POWER;
         }
         led_on();
+        if (step_index == 1) {
+          delay(TIME_DELAY_FOR_CONTOUR_CUTTING);
+        }
       }
       else {
         led_off();
@@ -146,6 +149,7 @@ void loop() {
       Is_destination_done = false;
     }
     else {
+      delay(TIME_DELAY_FOR_CONTOUR_CUTTING);
       led_off();
       rate = LASER_OFF_RATE;
       drawing_curve = false;
