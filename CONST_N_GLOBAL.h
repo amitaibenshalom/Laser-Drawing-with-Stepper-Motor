@@ -51,7 +51,7 @@ int16_t Current_Steps[NUMBER_OF_MOTORS] = {0, 0}; //can changed acording to numb
 int16_t MIN_Steps [NUMBER_OF_MOTORS] = {0, 0};
 int16_t MAX_Steps [NUMBER_OF_MOTORS] = {3500, 3500};
 int16_t HOMMING_Steps [NUMBER_OF_MOTORS] = {board_size[0]/mm_per_pulse[0], board_size[1]/mm_per_pulse[1]};
-int16_t STEPS_TO_CENTER = 100;
+int16_t STEPS_TO_CENTER = 170;
 
 float Current_Position[NUMBER_OF_MOTORS]={0.0,0.0};
 float destination[NUMBER_OF_MOTORS] ={0.0,0.0}; // nead to change name !!
@@ -81,7 +81,7 @@ uint16_t XYZ_rates [NUMBER_OF_MOVES] = {MIN_RATE, MIN_RATE, MIN_RATE, MIN_RATE};
 uint16_t XYZ_homming_rates [NUMBER_OF_MOVES] = {HOMMING_RATE, HOMMING_RATE, HOMMING_RATE, HOMMING_RATE}; // initial value same rates
 
 uint32_t last_time_dc_motor = 0;
-const int MAX_DC_MOTOR_TIME = 10000;
+const int MAX_DC_MOTOR_TIME = 2000;
 
 bool is_laser_on = false;
 bool is_dc_motor_on = false;

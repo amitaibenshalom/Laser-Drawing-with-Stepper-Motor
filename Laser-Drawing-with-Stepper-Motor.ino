@@ -173,7 +173,7 @@ void loop() {
             curves[i] = 0;
           set_destination(0,0);
           Is_destination_done = false;
-          Serial.println("Done!");
+          // Serial.println("Done!");
         }
         else {
           Serial.println("ERROR - DIDNT GET END KEY");
