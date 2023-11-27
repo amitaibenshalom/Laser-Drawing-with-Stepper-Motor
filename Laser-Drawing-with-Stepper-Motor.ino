@@ -130,15 +130,15 @@ void loop() {
     if (compute_next_bezier_point()) {
       if (in_destination()) {
         if (num_of_curves <= num_of_contour) {
-        rate = CONTOUR_RATE;
-        laser_power = CONTOUR_POWER;
+          rate = CONTOUR_RATE;
+          laser_power = CONTOUR_POWER;
         }
         else {
           rate = LASER_ON_RATE;
           laser_power = LASER_ON_POWER;
         }
         led_on();
-        if (step_index == 1) {
+        if (step_index == 1 && num_of_curves <= num_of_contour) {
           delay(TIME_DELAY_FOR_CONTOUR_CUTTING);
         }
       }
@@ -150,7 +150,8 @@ void loop() {
       Is_destination_done = false;
     }
     else {
-      delay(TIME_DELAY_FOR_CONTOUR_CUTTING);
+      if (num_of_curves <= num_of_contour)
+        delay(TIME_DELAY_FOR_CONTOUR_CUTTING);
       led_off();
       rate = LASER_OFF_RATE;
       drawing_curve = false;
