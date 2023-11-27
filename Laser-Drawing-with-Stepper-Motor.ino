@@ -63,11 +63,12 @@ void loop() {
         case 6: LASER_OFF_RATE = value; break;
         case 7: LASER_ON_RATE = value; break;
         case 8: CONTOUR_RATE = value; break;
+        case 9: MAX_DC_MOTOR_TIME = value; break;
         default: Serial.println("ERROR IN GETTING PARAMETERS"); break;
       }
     }
     param_index++;
-    if (param_index > 8) {
+    if (param_index >= PARAM_NUMBER) {
       got_param = true;
       param_index = 0;
       Serial.println("got all parameters - Im good to go");

@@ -68,6 +68,8 @@ byte CONTOUR_POWER = 255;
 uint16_t LASER_OFF_RATE = MIN_RATE;
 uint16_t LASER_ON_RATE = 80;
 uint16_t CONTOUR_RATE = 80;
+uint16_t MAX_DC_MOTOR_TIME = 1500;
+const uint8_t PARAM_NUMBER = 10;
 
 uint16_t TIME_DELAY_FOR_CONTOUR_CUTTING = 110; // delay in ms for letting the laser stay on a little longer for contour to be cut properly 
 
@@ -81,7 +83,6 @@ uint16_t XYZ_rates [NUMBER_OF_MOVES] = {MIN_RATE, MIN_RATE, MIN_RATE, MIN_RATE};
 uint16_t XYZ_homming_rates [NUMBER_OF_MOVES] = {HOMMING_RATE, HOMMING_RATE, HOMMING_RATE, HOMMING_RATE}; // initial value same rates
 
 uint32_t last_time_dc_motor = 0;
-const int MAX_DC_MOTOR_TIME = 2000;
 
 bool is_laser_on = false;
 bool is_dc_motor_on = false;
